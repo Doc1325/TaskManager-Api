@@ -1,0 +1,3 @@
+*.vs
+TaskManager/bin/
+TaskManager/obj/
