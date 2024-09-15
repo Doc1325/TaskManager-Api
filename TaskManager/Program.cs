@@ -23,17 +23,20 @@ builder.Services.AddControllers();
 //Servicios
 builder.Services.AddKeyedScoped<ICommonService<TaskDto, InsertTaskDto, UpdateTaskDto, int>, TaskService>("TaskService");
 builder.Services.AddKeyedScoped <ICommonService<StatusDto, InsertStatusDto, UpdateStatusDto, int>,StatusService>("StatusService");
+builder.Services.AddKeyedScoped<ICommonService<UserDto, InsertUserDto, UpdateUserDto, string>, UsersService>("UsersService");
 
 //Repositorios y DBContext
 builder.Services.AddKeyedScoped<IRepository<TaskItems>, TaskRepository>("Tasks");
 builder.Services.AddKeyedScoped<IRepository<Status>, StatusRepository>("Status");
+builder.Services.AddKeyedScoped<IRepository<Users>, UserRepository>("Users");
+
 builder.Services.AddDbContext<TaskContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionTaskManager"));
+    options.UseSqlServer(builder.Configuration["MiConexion"]);
 });
 
 // Mappers
-builder.Services.AddAutoMapper(typeof(Mapper), typeof(StatusMapper));
+builder.Services.AddAutoMapper(typeof(Mapper), typeof(StatusMapper), typeof(UserMapper));
 
 //Validadores
 builder.Services.AddKeyedScoped<IValidator<InsertTaskDto>, TaskValidator>("TasksValidator");

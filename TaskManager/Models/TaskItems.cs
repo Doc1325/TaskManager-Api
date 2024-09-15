@@ -12,13 +12,13 @@ namespace TaskManager.Models
         public string Title { get; set; }
         public string Description { get; set; }
 
-
+        /*
         [ForeignKey("Username")]
         public Users CreatedBy { get; set; }
-        
-        [ForeignKey("Username")]
-        public string AssignedTo {  get; set; }
 
+        [ForeignKey("Username")]
+        public Users AssignedTo { get; set; }
+        */
         public int StatusId;
         [ForeignKey("StatusId")]
         public virtual Status ?Status { get; set; }

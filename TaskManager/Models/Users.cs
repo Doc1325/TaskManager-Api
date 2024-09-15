@@ -13,9 +13,7 @@ namespace TaskManager.Models
 
         public string Password { get; set; }
 
-        [ForeignKey("RoleName")]
-        public virtual Roles Role {  get; set; }
-        
+        public string RoleName { get; set; } 
 
     }
 }
