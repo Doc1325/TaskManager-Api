@@ -32,7 +32,7 @@ builder.Services.AddKeyedScoped<IRepository<Users>, UserRepository>("Users");
 
 builder.Services.AddDbContext<TaskContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration["MiConexion"]);
+    options.UseSqlServer(builder.Configuration["MyDatabaseConnection"]); // utilizo un secreto para mi bd local
 });
 
 // Mappers

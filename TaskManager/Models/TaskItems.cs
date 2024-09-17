@@ -1,29 +1,36 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
-namespace TaskManager.Models
+namespace TaskManager.Models;
+
+[Index("StatusId", Name = "IX_Tasks_StatusId")]
+public partial class TaskItems
 {
-    public class TaskItems
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int TaskId { get; set; }
+    [Key]
+    public int TaskId { get; set; }
 
-        public string Title { get; set; }
-        public string Description { get; set; }
+    public string Title { get; set; } = null!;
 
-        /*
-        [ForeignKey("Username")]
-        public Users CreatedBy { get; set; }
+    public string Description { get; set; } = null!;
 
-        [ForeignKey("Username")]
-        public Users AssignedTo { get; set; }
-        */
-        public int StatusId;
-        [ForeignKey("StatusId")]
-        public virtual Status ?Status { get; set; }
+    public int StatusId { get; set; }
 
-       
+    public int CreatorId { get; set; }
 
-    }
+    public int AsignnedId { get; set; }
+
+    [ForeignKey("AsignnedId")]
+    [InverseProperty("TaskAsignneds")]
+    public virtual Users Asignned { get; set; } = null!;
+
+    [ForeignKey("CreatorId")]
+    [InverseProperty("TaskCreators")]
+    public virtual Users Creator { get; set; } = null!;
+
+    [ForeignKey("StatusId")]
+    [InverseProperty("Tasks")]
+    public virtual Status Status { get; set; } = null!;
 }

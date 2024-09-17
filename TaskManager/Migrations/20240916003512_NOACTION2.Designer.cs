@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManager.Models;
 
@@ -11,9 +12,11 @@ using TaskManager.Models;
 namespace TaskManager.Migrations
 {
     [DbContext(typeof(TaskContext))]
-    partial class TaskContextModelSnapshot : ModelSnapshot
+    [Migration("20240916003512_NOACTION2")]
+    partial class NOACTION2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -122,11 +125,13 @@ namespace TaskManager.Migrations
                 {
                     b.HasOne("TaskManager.Models.Users", "Assigned")
                         .WithMany()
-                        .HasForeignKey("AssignedId");
+                        .HasForeignKey("AssignedId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("TaskManager.Models.Users", "Creator")
                         .WithMany()
-                        .HasForeignKey("CreatorId");
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("TaskManager.Models.Status", "Status")
                         .WithMany()

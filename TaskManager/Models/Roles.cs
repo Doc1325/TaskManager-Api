@@ -1,20 +1,19 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection.Metadata;
+using Microsoft.EntityFrameworkCore;
 
-namespace TaskManager.Models
+namespace TaskManager.Models;
+
+[Index("RoleName", Name = "AK_Roles_RoleName", IsUnique = true)]
+public partial class Roles
 {
-    public class Roles
-    {
-        
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]      
-        public int Id { get; set; }
-        public string RoleName { get; set; }
-    }
+    [Key]
+    public int Id { get; set; }
 
- 
+    public string RoleName { get; set; } = null!;
 
-
+    [InverseProperty("RoleNameNavigation")]
+    public virtual ICollection<Users> Users { get; set; } = new List<Users>();
 }
