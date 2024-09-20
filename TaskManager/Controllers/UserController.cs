@@ -37,7 +37,7 @@ namespace TaskManager.Controllers
                 List<Claim> ClaimList = new List<Claim>();
                 ClaimList.Add(new Claim(ClaimTypes.Name, UserToLog.Username));
 
-                var Roles = UserToLog.ToString().Split(",");
+                var Roles = UserToLog.RoleName.ToString().Split(",");
 
                 foreach (var r in Roles)
                 {

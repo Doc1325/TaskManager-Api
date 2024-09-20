@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskManager.Dtos;
@@ -75,9 +76,10 @@ namespace TaskManager.Controllers
         }
 
 
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "User")]
 
-        [HttpDelete("{id}")] 
-       public  async Task<IActionResult> Delete(int id) {
+        public async Task<IActionResult> Delete(int id) {
 
 
             var task = await _taskService.Delete(id);
