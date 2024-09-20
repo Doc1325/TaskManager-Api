@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using TaskManager.Dtos;
 using TaskManager.Models;
 using TaskManager.Repository;
@@ -44,7 +45,8 @@ namespace TaskManager.Services
 
             if(UserToLog != null)
             {
-
+              
+                
                 return UserToLog;
 
             }

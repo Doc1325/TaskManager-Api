@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TaskManager.Dtos;
 using TaskManager.Services;
 
@@ -27,14 +30,35 @@ namespace TaskManager.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> LogIn(InsertUserDto UserToValidate)
         {
-            var user = _userService.IsValidUser(UserToValidate);
+            var UserToLog = _userService.IsValidUser(UserToValidate);
 
-            if(user != null)
+            if(UserToLog != null)
             {
-                return Ok("El usuario existe");
-            }
-            return NotFound("El usuario no existe");
+                List<Claim> ClaimList = new List<Claim>();
+                ClaimList.Add(new Claim(ClaimTypes.Name, UserToLog.Username));
 
+                var Roles = UserToLog.ToString().Split(",");
+
+                foreach (var r in Roles)
+                {
+                    ClaimList.Add(new Claim(ClaimTypes.Role, r));
+                }
+                AuthenticationProperties props = new AuthenticationProperties()
+                {
+                    AllowRefresh = true
+                };
+
+                ClaimsIdentity claimsIdentity = new ClaimsIdentity(ClaimList, 
+                CookieAuthenticationDefaults.AuthenticationScheme);
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity),
+                    props
+                    );
+                return Ok("Autenticacion exitosa");
+            }
+            return Unauthorized("Usuario o contraseña incorrectos");
 
 
 

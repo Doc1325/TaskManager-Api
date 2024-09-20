@@ -1,4 +1,5 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Controllers;
 using TaskManager.Dtos;
@@ -45,6 +46,20 @@ builder.Services.AddKeyedScoped<IValidator<UpdateTaskDto>, UpdateTaskValidator>(
 builder.Services.AddKeyedScoped<IValidator<UpdateStatusDto>, UpdateStatusValidator>("UpdateStatusValidator");
 
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
+
+    options =>
+    {
+        options.ExpireTimeSpan = TimeSpan.FromSeconds(40);
+        options.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        };
+    }
+
+    );
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -59,7 +74,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
