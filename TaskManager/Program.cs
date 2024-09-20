@@ -23,7 +23,7 @@ builder.Services.AddControllers();
 //Servicios
 builder.Services.AddKeyedScoped<ICommonService<TaskDto, InsertTaskDto, UpdateTaskDto, int>, TaskService>("TaskService");
 builder.Services.AddKeyedScoped <ICommonService<StatusDto, InsertStatusDto, UpdateStatusDto, int>,StatusService>("StatusService");
-builder.Services.AddKeyedScoped<ICommonService<UserDto, InsertUserDto, UpdateUserDto, string>, UsersService>("UsersService");
+builder.Services.AddScoped<IUserService, UsersService>();
 
 //Repositorios y DBContext
 builder.Services.AddKeyedScoped<IRepository<TaskItems>, TaskRepository>("Tasks");

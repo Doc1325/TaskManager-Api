@@ -9,19 +9,36 @@ namespace TaskManager.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        ICommonService<UserDto,InsertUserDto,UpdateUserDto,string> _userService;
-        public UserController([FromKeyedServices("UsersService")]ICommonService<UserDto,InsertUserDto,UpdateUserDto,string> userService) { 
-          _userService = userService;
+        IUserService _userService;
+        public UserController( IUserService userService)
+        {
+            _userService = userService;
         }
 
-        [HttpPost]
+        [HttpPost("Register")]
         public async Task<IActionResult> Register(InsertUserDto NewUser)
         {
-            var userDto = await _userService.Add(NewUser);
+            var userDto = await _userService.AddUser(NewUser);
 
-            return Ok(userDto);
+            return Ok("Usuario: " + userDto.Username + " creado satisfactoriamente");
 
         }
-        
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> LogIn(InsertUserDto UserToValidate)
+        {
+            var user = _userService.IsValidUser(UserToValidate);
+
+            if(user != null)
+            {
+                return Ok("El usuario existe");
+            }
+            return NotFound("El usuario no existe");
+
+
+
+
+        }
     }
-}
+
+    }

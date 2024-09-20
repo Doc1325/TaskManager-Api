@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 using TaskManager.Dtos;
 using TaskManager.Models;
 using TaskManager.Repository;
@@ -6,7 +7,7 @@ using TaskManager.Utils;
 
 namespace TaskManager.Services
 {
-    public class UsersService:ICommonService<UserDto,InsertUserDto,UpdateUserDto,string>
+    public class UsersService: IUserService
     {
 
         private IRepository<Users> _repository;
@@ -18,9 +19,8 @@ namespace TaskManager.Services
 
         }
 
-        public List<string> Errors => throw new NotImplementedException();
 
-        public async Task<UserDto> Add(InsertUserDto Insertitem)
+        public async Task<UserDto> AddUser(InsertUserDto Insertitem)
         {
             Insertitem.Password = PassEncrypter.EncryptPassword(Insertitem.Password);
             var NewUser = _mapper.Map<Users>(Insertitem);
@@ -35,24 +35,24 @@ namespace TaskManager.Services
            
         }
 
-        public Task<UserDto> Delete(int id)
+      
+
+        public UserDto IsValidUser(InsertUserDto user)
         {
-            throw new NotImplementedException();
+            var UserToLog =  _mapper.Map<UserDto>(_repository.GetByFilter((u) => u.Username == user.Username &&
+            u.Password == PassEncrypter.EncryptPassword(user.Password)).FirstOrDefault() );
+
+            if(UserToLog != null)
+            {
+
+                return UserToLog;
+
+            }
+
+            
+            return null;
         }
 
-        public Task<IEnumerable<UserDto>> Get()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<UserDto> GetByFilter(string filter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<UserDto> Update(UpdateUserDto updatedItem, int id)
-        {
-            throw new NotImplementedException();
-        }
+    
     }
 }

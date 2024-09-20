@@ -1,4 +1,5 @@
-﻿using TaskManager.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using TaskManager.Models;
 
 namespace TaskManager.Repository
 {
@@ -27,7 +28,8 @@ namespace TaskManager.Repository
 
         public IEnumerable<Users> GetByFilter(Func<Users, bool> filter)
         {
-            throw new NotImplementedException();
+            return _taskContext.Users.Where(filter);
+
         }
 
         public Task<Users> GetById(int id)
