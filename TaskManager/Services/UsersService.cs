@@ -6,6 +6,7 @@ using TaskManager.Models;
 using TaskManager.Repository;
 using TaskManager.Utils;
 
+
 namespace TaskManager.Services
 {
     public class UsersService: IUserService
@@ -14,6 +15,8 @@ namespace TaskManager.Services
         private IRepository<Users> _repository;
         private IMapper _mapper;
 
+        public List<string> Errors => throw new NotImplementedException();
+
         public UsersService([FromKeyedServices("Users")] IRepository<Users> repository, IMapper mapper) { 
             _repository = repository;
             _mapper = mapper;
@@ -21,7 +24,7 @@ namespace TaskManager.Services
         }
 
 
-        public async Task<UserDto> AddUser(InsertUserDto Insertitem)
+        public async Task<UserDto> Add(InsertUserDto Insertitem)
         {
             Insertitem.Password = PassEncrypter.EncryptPassword(Insertitem.Password);
             var NewUser = _mapper.Map<Users>(Insertitem);
@@ -55,6 +58,31 @@ namespace TaskManager.Services
             return null;
         }
 
-    
+        public async Task<UserDto> GetById(int id)
+        {
+            Users user = await _repository.GetById(id);
+           var userDto = _mapper.Map<UserDto>(user);
+            return userDto;
+        }
+
+        public Task<UserDto> Delete(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<UserDto> Update(UpdateUserDto updatedItem, int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<UserDto>> Get()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<UserDto> GetByFilter(int filter)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

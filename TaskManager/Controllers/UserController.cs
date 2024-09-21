@@ -21,7 +21,7 @@ namespace TaskManager.Controllers
         [HttpPost("Register")]
         public async Task<IActionResult> Register(InsertUserDto NewUser)
         {
-            var userDto = await _userService.AddUser(NewUser);
+            var userDto = await _userService.Add(NewUser);
 
             return Ok("Usuario: " + userDto.Username + " creado satisfactoriamente");
 
@@ -43,6 +43,8 @@ namespace TaskManager.Controllers
                 {
                     ClaimList.Add(new Claim(ClaimTypes.Role, r));
                 }
+
+                ClaimList.Add(new Claim(ClaimTypes.NameIdentifier, UserToLog.ToString()));
                 AuthenticationProperties props = new AuthenticationProperties()
                 {
                     AllowRefresh = true

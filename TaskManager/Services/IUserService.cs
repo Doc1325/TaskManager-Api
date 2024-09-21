@@ -2,10 +2,10 @@
 
 namespace TaskManager.Services
 {
-    public interface IUserService
+    public interface IUserService: ICommonService<UserDto,InsertUserDto,UpdateUserDto,int>
     {
-        public Task<UserDto> AddUser(InsertUserDto dto);
         public UserDto IsValidUser(InsertUserDto dto);
+        public Task<UserDto> GetById(int id);
 
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using TaskManager.Dtos;
 using TaskManager.Models;
 using TaskManager.Repository;
+using Microsoft.AspNetCore.Http;
 
 namespace TaskManager.Services
 {
@@ -11,15 +12,21 @@ namespace TaskManager.Services
        private IRepository<TaskItems> _repository;
         private IMapper _mapper;
         private ICommonService<StatusDto, InsertStatusDto, UpdateStatusDto, int> _statusService;
+        private IUserService _userService;
         public List<String> Errors { get; }
+        private readonly IHttpContextAccessor _http;
         public TaskService([FromKeyedServices("Tasks")]IRepository<TaskItems> repository,
             [FromKeyedServices("StatusService")] ICommonService<StatusDto, InsertStatusDto, UpdateStatusDto, int> StatusService, 
-            IMapper mapper) {
+            IMapper mapper
+             ,IUserService userService,
+            IHttpContextAccessor http) {
             
             _repository = repository;
             _mapper = mapper;
             _statusService = StatusService;
             Errors = new List<String>();
+            _userService = userService;
+            _http = http;  
             
         }
         public async Task<TaskDto> Add(InsertTaskDto NewTask)
@@ -52,6 +59,17 @@ namespace TaskManager.Services
 
         }
 
+
+        public async Task<IEnumerable<TaskDto>> GetFromUser(int userId)
+        {
+            userId = 5;
+            var TaskList = await _repository.Get();
+
+
+            return TaskList.Select(t => _mapper.Map<TaskDto>(t));
+
+        }
+
         public IEnumerable<TaskDto> GetByFilter(int StatusId)
         {
            var TaskList = _repository.GetByFilter(item => item.StatusId == StatusId);
@@ -61,13 +79,23 @@ namespace TaskManager.Services
 
         public async Task<TaskDto> Delete(int id)
         {
+
           TaskItems TaskToRemove = await _repository.GetById(id);
             if (TaskToRemove == null)
             {
                 Errors.Add("El Id de la tarea es invalido");
                 return null;
             }
-            TaskDto dto = _mapper.Map<TaskDto>(TaskToRemove);
+
+            UserDto userToVerify = await _userService.GetById(TaskToRemove.CreatorId);
+
+            if (userToVerify.Username != _http.HttpContext.User.Identity.Name  )
+            {
+                return null;
+                
+
+            }
+                TaskDto dto = _mapper.Map<TaskDto>(TaskToRemove);
             _repository.Delete(TaskToRemove);
             await _repository.Save();
             return dto;

@@ -25,6 +25,7 @@ builder.Services.AddControllers();
 builder.Services.AddKeyedScoped<ICommonService<TaskDto, InsertTaskDto, UpdateTaskDto, int>, TaskService>("TaskService");
 builder.Services.AddKeyedScoped <ICommonService<StatusDto, InsertStatusDto, UpdateStatusDto, int>,StatusService>("StatusService");
 builder.Services.AddScoped<IUserService, UsersService>();
+builder.Services.AddHttpContextAccessor();
 
 //Repositorios y DBContext
 builder.Services.AddKeyedScoped<IRepository<TaskItems>, TaskRepository>("Tasks");

@@ -32,9 +32,9 @@ namespace TaskManager.Repository
 
         }
 
-        public Task<Users> GetById(int id)
+        public async Task<Users> GetById(int id)
         {
-            throw new NotImplementedException();
+            return await _taskContext.Users.FindAsync(id);
         }
 
         public async Task Save()
