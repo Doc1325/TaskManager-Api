@@ -4,6 +4,7 @@ using TaskManager.Dtos;
 using TaskManager.Models;
 using TaskManager.Repository;
 using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace TaskManager.Services
 {
@@ -50,20 +51,14 @@ namespace TaskManager.Services
 
         }
 
+       
+
+
         public async Task<IEnumerable<TaskDto>> Get()
         {
-           var TaskList = await _repository.Get();
+            var userId = int.Parse(_http.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString());
 
-
-            return TaskList.Select(t => _mapper.Map<TaskDto>(t));
-
-        }
-
-
-        public async Task<IEnumerable<TaskDto>> GetFromUser(int userId)
-        {
-            userId = 5;
-            var TaskList = await _repository.Get();
+            var TaskList =  _repository.GetByFilter(t => t.AsignnedId == userId);
 
 
             return TaskList.Select(t => _mapper.Map<TaskDto>(t));

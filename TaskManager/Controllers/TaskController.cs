@@ -30,6 +30,8 @@ namespace TaskManager.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "User")]
+
         public async Task <IEnumerable<TaskDto>> Get()
         {
 
