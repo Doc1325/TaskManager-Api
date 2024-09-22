@@ -99,6 +99,7 @@ namespace TaskManager.Services
         public async Task<TaskDto> Update(UpdateTaskDto updatedItem, int id)
         {
             TaskItems TaskToUpdate = await _repository.GetById(id);
+            TaskDto dto = new TaskDto();
             if (TaskToUpdate == null)
             {
                 Errors.Add("El Id de la tarea es invalido");
@@ -112,12 +113,37 @@ namespace TaskManager.Services
 
                 return null;
             }
-            TaskToUpdate = _mapper.Map<UpdateTaskDto, TaskItems>(updatedItem,TaskToUpdate);
-            _repository.Update(TaskToUpdate);
-            await _repository.Save();
-            var dto = _mapper.Map<TaskDto>(TaskToUpdate);
-            return dto;
+            if(TaskToUpdate.CreatorId == int.Parse(_http.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()))
+            {
 
+                TaskToUpdate = _mapper.Map<UpdateTaskDto, TaskItems>(updatedItem, TaskToUpdate);
+                _repository.Update(TaskToUpdate);
+                await _repository.Save();
+                dto = _mapper.Map<TaskDto>(TaskToUpdate);
+                return dto;
+
+            } 
+            
+            if (TaskToUpdate.AsignnedId == int.Parse(_http.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()))
+            {
+                if(TaskToUpdate.Title != updatedItem.Title || TaskToUpdate.Description != updatedItem.Description)
+                {
+                    Errors.Add("No tienes permisos para modificar el nombre ni descripcion de esta tarea");
+
+                    return null;
+                }
+
+                TaskToUpdate = _mapper.Map<UpdateTaskDto, TaskItems>(updatedItem, TaskToUpdate);
+                _repository.Update(TaskToUpdate);
+                await _repository.Save();
+                dto = _mapper.Map<TaskDto>(TaskToUpdate);
+                return dto;
+
+
+            }
+
+
+            return null;
         }
     }
 }
