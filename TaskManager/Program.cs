@@ -22,7 +22,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 
 //Servicios
-builder.Services.AddKeyedScoped<ICommonService<TaskDto, InsertTaskDto, UpdateTaskDto, int>, TaskService>("TaskService");
+builder.Services.AddKeyedScoped<ITaskservice, TaskService>("TaskService");
 builder.Services.AddKeyedScoped <ICommonService<StatusDto, InsertStatusDto, UpdateStatusDto, int>,StatusService>("StatusService");
 builder.Services.AddScoped<IUserService, UsersService>();
 builder.Services.AddHttpContextAccessor();

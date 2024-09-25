@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace TaskManager.Services
 {
-    public class TaskService : ICommonService<TaskDto, InsertTaskDto, UpdateTaskDto, int>
+    public class TaskService : ITaskservice
     {
        private IRepository<TaskItems> _repository;
         private IMapper _mapper;
@@ -51,15 +51,27 @@ namespace TaskManager.Services
 
         }
 
-       
 
 
         public async Task<IEnumerable<TaskDto>> Get()
         {
+
+            var TaskList = await _repository.Get();
+
+            return TaskList.Select(t => _mapper.Map<TaskDto>(t));
+        }
+
+        public async Task<IEnumerable<TaskDto>> Get(bool IsAdmin)
+        {
             var userId = int.Parse(_http.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString());
+            Func<TaskItems, bool> filter;
 
-            var TaskList =  _repository.GetByFilter(t => t.AsignnedId == userId);
+            filter = t => t.AsignnedId == userId;
 
+            if (IsAdmin) filter = t => t.CreatorId == userId;
+            filter = t => t.AsignnedId == userId;
+
+            var TaskList = _repository.GetByFilter(filter);
 
             return TaskList.Select(t => _mapper.Map<TaskDto>(t));
 

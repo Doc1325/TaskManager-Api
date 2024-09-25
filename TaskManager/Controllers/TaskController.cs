@@ -14,12 +14,12 @@ namespace TaskManager.Controllers
     public class TaskController : ControllerBase
     {
 
-       private ICommonService<TaskDto, InsertTaskDto, UpdateTaskDto,int> _taskService;
+       private ITaskservice _taskService;
        private IValidator<InsertTaskDto> _taskValidator;
         private IValidator<UpdateTaskDto> _updateTaskValidator;
 
 
-        public TaskController([FromKeyedServices("TaskService")]ICommonService<TaskDto,InsertTaskDto,UpdateTaskDto,int> TaskService,
+        public TaskController([FromKeyedServices("TaskService")]ITaskservice TaskService,
             [FromKeyedServices("TasksValidator")] IValidator<InsertTaskDto> TaskValidator,
             [FromKeyedServices("UpdateTasksValidator")] IValidator<UpdateTaskDto> UpdateTaskValidator)
         { 
@@ -29,17 +29,30 @@ namespace TaskManager.Controllers
 
         }
 
-        [HttpGet]
-        [Authorize(Roles = "User")]
+        [HttpGet("/createdTasks")]
+        [Authorize(Roles = "Admin")]
 
-        public async Task <IEnumerable<TaskDto>> Get()
+        public async Task <IEnumerable<TaskDto>> GetCreated()
         {
 
-            var TaskList = await _taskService.Get();
+            var TaskList = await _taskService.Get(true);
             return TaskList;
 
 
         }
+
+        [HttpGet("/AssignedTasks")]
+        [Authorize(Roles = "User")]
+
+        public async Task<IEnumerable<TaskDto>> GetAssigned()
+        {
+
+            var TaskList = await _taskService.Get(false);
+            return TaskList;
+
+
+        }
+
 
 
         [HttpGet("{statusid}")]
