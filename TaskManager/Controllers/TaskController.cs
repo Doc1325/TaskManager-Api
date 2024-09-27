@@ -29,7 +29,7 @@ namespace TaskManager.Controllers
 
         }
 
-        [HttpGet("/createdTasks")]
+        [HttpGet("CreatedTasks")]
         [Authorize(Roles = "Admin")]
 
         public async Task <IEnumerable<TaskDto>> GetCreated()
@@ -41,7 +41,10 @@ namespace TaskManager.Controllers
 
         }
 
-        [HttpGet("/AssignedTasks")]
+
+
+
+        [HttpGet("AssignedTasks")]
         [Authorize(Roles = "User")]
 
         public async Task<IEnumerable<TaskDto>> GetAssigned()
@@ -55,6 +58,7 @@ namespace TaskManager.Controllers
 
 
 
+
         [HttpGet("{statusid}")]
        public  IEnumerable<TaskDto> GetByStatus(int statusid)
         {
@@ -65,14 +69,18 @@ namespace TaskManager.Controllers
         }
 
 
+
+        
         [HttpPost()]
-       public async Task<IActionResult> Add(InsertTaskDto NewTask)
+        [Authorize(Roles = "Admin, User")]
+
+        public async Task<IActionResult> Add(InsertTaskDto NewTask)
         {
             var validate = _taskValidator.Validate(NewTask);
             if (!validate.IsValid) return BadRequest(validate.Errors);
             var task = await _taskService.Add(NewTask);
             if (task == null) return BadRequest(_taskService.Errors);
-            return Ok(task); 
+            return Ok(task);
 
 
 

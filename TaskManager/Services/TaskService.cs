@@ -30,8 +30,33 @@ namespace TaskManager.Services
             _http = http;  
             
         }
+
+
+       
+
         public async Task<TaskDto> Add(InsertTaskDto NewTask)
         {
+            UserDto userLogged =
+           new UserDto
+           {
+
+               Id = int.Parse(_http.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()),
+               RoleName = _http.HttpContext.User.FindFirst(ClaimTypes.Role).Value.ToString()
+
+
+           };
+
+            if (NewTask.CreatorId != userLogged.Id)
+            {
+                Errors.Add("No puedes crear una tarea en nombre de otro usuario");
+                return null;
+            }
+
+            if (NewTask.AsignnedId != userLogged.Id && userLogged.RoleName != "Admin")
+            {
+                Errors.Add("No tienes permisos para asignar tareas a otro usuario");
+                return null;
+            }
 
             if (_statusService.GetByFilter(NewTask.StatusId).IsNullOrEmpty())
             {
@@ -40,6 +65,8 @@ namespace TaskManager.Services
                 return null;
 
             }
+
+           
             TaskItems item = _mapper.Map<TaskItems>(NewTask);
            
             await _repository.Add(item);
@@ -52,26 +79,22 @@ namespace TaskManager.Services
         }
 
 
-
         public async Task<IEnumerable<TaskDto>> Get()
         {
 
-            var TaskList = await _repository.Get();
+            UserDto userLogged = new UserDto
+              { 
+               Id = int.Parse(_http.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()),
+               RoleName = _http.HttpContext.User.FindFirst(ClaimTypes.Role).Value.ToString()
+              };
 
-            return TaskList.Select(t => _mapper.Map<TaskDto>(t));
-        }
-
-        public async Task<IEnumerable<TaskDto>> Get(bool IsAdmin)
-        {
-            var userId = int.Parse(_http.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString());
             Func<TaskItems, bool> filter;
 
-            filter = t => t.AsignnedId == userId;
 
-            if (IsAdmin) filter = t => t.CreatorId == userId;
-            filter = t => t.AsignnedId == userId;
+            if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.Id;
+            else filter = t => t.AsignnedId == userLogged.Id;
 
-            var TaskList = _repository.GetByFilter(filter);
+            var TaskList =  _repository.GetByFilter(filter);
 
             return TaskList.Select(t => _mapper.Map<TaskDto>(t));
 
