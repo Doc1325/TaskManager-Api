@@ -15,36 +15,24 @@ namespace TaskManager.Services
         private ICommonService<StatusDto, InsertStatusDto, UpdateStatusDto, int> _statusService;
         private IUserService _userService;
         public List<String> Errors { get; }
-        private readonly IHttpContextAccessor _http;
         public TaskService([FromKeyedServices("Tasks")]IRepository<TaskItems> repository,
             [FromKeyedServices("StatusService")] ICommonService<StatusDto, InsertStatusDto, UpdateStatusDto, int> StatusService, 
             IMapper mapper
-             ,IUserService userService,
-            IHttpContextAccessor http) {
+             ,IUserService userService) {
             
             _repository = repository;
             _mapper = mapper;
             _statusService = StatusService;
-            Errors = new List<String>();
             _userService = userService;
-            _http = http;  
-            
+            Errors = new List<String>();
+
         }
-
-
-       
-
+ 
         public async Task<TaskDto> Add(InsertTaskDto NewTask)
         {
-            UserDto userLogged =
-           new UserDto
-           {
-
-               Id = int.Parse(_http.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()),
-               RoleName = _http.HttpContext.User.FindFirst(ClaimTypes.Role).Value.ToString()
+            UserDto userLogged = _userService.GetLoggedUser();
 
 
-           };
 
             if (NewTask.CreatorId != userLogged.Id)
             {
@@ -82,17 +70,13 @@ namespace TaskManager.Services
         public async Task<IEnumerable<TaskDto>> Get()
         {
 
-            UserDto userLogged = new UserDto
-              { 
-               Id = int.Parse(_http.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()),
-               RoleName = _http.HttpContext.User.FindFirst(ClaimTypes.Role).Value.ToString()
-              };
+            UserDto userLogged = _userService.GetLoggedUser();
 
             Func<TaskItems, bool> filter;
 
 
             if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.Id;
-            else filter = t => t.AsignnedId == userLogged.Id;
+            else filter = t => t.AsignnedId == userLogged.Id ;
 
             var TaskList =  _repository.GetByFilter(filter);
 
@@ -101,8 +85,17 @@ namespace TaskManager.Services
         }
 
         public IEnumerable<TaskDto> GetByFilter(int StatusId)
+
         {
-           var TaskList = _repository.GetByFilter(item => item.StatusId == StatusId);
+            UserDto userLogged = _userService.GetLoggedUser();
+
+
+            Func<TaskItems, bool> filter;
+
+            if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.Id && t.StatusId == StatusId;
+            else filter = t => t.AsignnedId == userLogged.Id && t.StatusId == StatusId;
+
+            var TaskList = _repository.GetByFilter(filter);
 
             return TaskList.Select(t => _mapper.Map<TaskDto>(t));
         }
@@ -118,9 +111,11 @@ namespace TaskManager.Services
             }
 
             UserDto userToVerify = await _userService.GetById(TaskToRemove.CreatorId);
+            UserDto userLogged = _userService.GetLoggedUser();
 
-            if (userToVerify.Username != _http.HttpContext.User.Identity.Name  )
+            if (userToVerify.Id != userLogged.Id  )
             {
+                Errors.Add("No eres el creador de esta Tarea");
                 return null;
                 
 
@@ -134,6 +129,7 @@ namespace TaskManager.Services
         public async Task<TaskDto> Update(UpdateTaskDto updatedItem, int id)
         {
             TaskItems TaskToUpdate = await _repository.GetById(id);
+            UserDto userLogged = _userService.GetLoggedUser();
             TaskDto dto = new TaskDto();
             if (TaskToUpdate == null)
             {
@@ -148,7 +144,7 @@ namespace TaskManager.Services
 
                 return null;
             }
-            if(TaskToUpdate.CreatorId == int.Parse(_http.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()))
+            if(TaskToUpdate.CreatorId == userLogged.Id)
             {
 
                 TaskToUpdate = _mapper.Map<UpdateTaskDto, TaskItems>(updatedItem, TaskToUpdate);
@@ -159,7 +155,7 @@ namespace TaskManager.Services
 
             } 
             
-            if (TaskToUpdate.AsignnedId == int.Parse(_http.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()))
+            if (TaskToUpdate.AsignnedId == userLogged.Id)
             {
                 if(TaskToUpdate.Title != updatedItem.Title || TaskToUpdate.Description != updatedItem.Description)
                 {

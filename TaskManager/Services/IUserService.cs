@@ -6,6 +6,7 @@ namespace TaskManager.Services
     {
         public UserDto IsValidUser(InsertUserDto dto);
         public Task<UserDto> GetById(int id);
+        public UserDto GetLoggedUser();
 
     }
 }

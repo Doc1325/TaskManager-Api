@@ -29,28 +29,18 @@ namespace TaskManager.Controllers
 
         }
 
-        [HttpGet("CreatedTasks")]
-        [Authorize(Roles = "Admin")]
-
-        public async Task <IEnumerable<TaskDto>> GetCreated()
-        {
-
-            var TaskList = await _taskService.Get(true);
-            return TaskList;
-
-
-        }
+     
 
 
 
 
-        [HttpGet("AssignedTasks")]
-        [Authorize(Roles = "User")]
+        [HttpGet()]
+        [Authorize(Roles = "Admin, User")]
 
         public async Task<IEnumerable<TaskDto>> GetAssigned()
         {
 
-            var TaskList = await _taskService.Get(false);
+            var TaskList = await _taskService.Get();
             return TaskList;
 
 

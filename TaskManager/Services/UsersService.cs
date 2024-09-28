@@ -5,6 +5,7 @@ using TaskManager.Dtos;
 using TaskManager.Models;
 using TaskManager.Repository;
 using TaskManager.Utils;
+using static System.Net.WebRequestMethods;
 
 
 namespace TaskManager.Services
@@ -14,12 +15,15 @@ namespace TaskManager.Services
 
         private IRepository<Users> _repository;
         private IMapper _mapper;
+        private readonly IHttpContextAccessor _http;
+
 
         public List<string> Errors => throw new NotImplementedException();
 
-        public UsersService([FromKeyedServices("Users")] IRepository<Users> repository, IMapper mapper) { 
+        public UsersService([FromKeyedServices("Users")] IRepository<Users> repository, IMapper mapper, IHttpContextAccessor http) { 
             _repository = repository;
             _mapper = mapper;
+            _http = http;
 
         }
 
@@ -39,9 +43,7 @@ namespace TaskManager.Services
            
         }
 
-      
-
-        public UserDto IsValidUser(InsertUserDto user)
+                     public UserDto IsValidUser(InsertUserDto user)
         {
             var UserToLog =  _mapper.Map<UserDto>(_repository.GetByFilter((u) => u.Username == user.Username &&
             u.Password == PassEncrypter.EncryptPassword(user.Password)).FirstOrDefault() );
@@ -83,6 +85,16 @@ namespace TaskManager.Services
         public IEnumerable<UserDto> GetByFilter(int filter)
         {
             throw new NotImplementedException();
+        }
+
+        public UserDto GetLoggedUser()
+        {
+         return   new UserDto
+            {
+                Id = int.Parse(_http.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()),
+                RoleName = _http.HttpContext.User.FindFirst(ClaimTypes.Role).Value.ToString()
+            };
+
         }
     }
 }
