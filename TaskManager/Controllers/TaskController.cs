@@ -29,21 +29,15 @@ namespace TaskManager.Controllers
 
         }
 
-     
-
-
-
 
         [HttpGet()]
         [Authorize(Roles = "Admin, User")]
 
-        public async Task<IEnumerable<TaskDto>> GetAssigned()
+        public async Task<IEnumerable<TaskDto>> Get()
         {
 
             var TaskList = await _taskService.Get();
             return TaskList;
-
-
         }
 
 
@@ -76,7 +70,7 @@ namespace TaskManager.Controllers
 
         }
 
-
+        [Authorize(Roles = "Admin, User")]
         [HttpPut("{id}")]
        public async Task<IActionResult>  Update(int id, UpdateTaskDto UpdatedTask)
         {

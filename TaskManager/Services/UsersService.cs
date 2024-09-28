@@ -89,10 +89,15 @@ namespace TaskManager.Services
 
         public UserDto GetLoggedUser()
         {
+
+
+            ClaimsPrincipal? user = _http?.HttpContext?.User;
+            if (user == null) return null;
          return   new UserDto
+
             {
-                Id = int.Parse(_http.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()),
-                RoleName = _http.HttpContext.User.FindFirst(ClaimTypes.Role).Value.ToString()
+                Id = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()),
+                RoleName = user.FindFirst(ClaimTypes.Role)?.Value.ToString()
             };
 
         }

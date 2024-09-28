@@ -157,10 +157,9 @@ namespace TaskManager.Services
             
             if (TaskToUpdate.AsignnedId == userLogged.Id)
             {
-                if(TaskToUpdate.Title != updatedItem.Title || TaskToUpdate.Description != updatedItem.Description)
+                if(TaskToUpdate.Title != updatedItem.Title || TaskToUpdate.Description != updatedItem.Description || TaskToUpdate.AsignnedId != updatedItem.AsignnedId)
                 {
-                    Errors.Add("No tienes permisos para modificar el nombre ni descripcion de esta tarea");
-
+                    Errors.Add("Solo tienes permiso para modificar el estatus de esta tarea");
                     return null;
                 }
 
@@ -172,9 +171,7 @@ namespace TaskManager.Services
 
 
             }
-
-
-            return null;
+                return null;
         }
     }
 }
