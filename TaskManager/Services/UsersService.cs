@@ -18,18 +18,25 @@ namespace TaskManager.Services
         private readonly IHttpContextAccessor _http;
 
 
-        public List<string> Errors => throw new NotImplementedException();
+        public List<String> Errors { get; }
 
         public UsersService([FromKeyedServices("Users")] IRepository<Users> repository, IMapper mapper, IHttpContextAccessor http) { 
             _repository = repository;
             _mapper = mapper;
             _http = http;
+            Errors = new List<String>();
 
         }
 
 
         public async Task<UserDto> Add(InsertUserDto Insertitem)
         {
+
+            var ExistUser = _repository.GetByFilter(u => u.Username.ToLower() == Insertitem.Username.ToLower()).FirstOrDefault();
+            if (ExistUser == null)
+            {
+                Errors.Add("Ya existe un usuario con este nombre");
+            }
             Insertitem.Password = PassEncrypter.EncryptPassword(Insertitem.Password);
             var NewUser = _mapper.Map<Users>(Insertitem);
 
@@ -43,7 +50,7 @@ namespace TaskManager.Services
            
         }
 
-                     public UserDto IsValidUser(InsertUserDto user)
+        public UserDto IsValidUser(InsertUserDto user)
         {
             var UserToLog =  _mapper.Map<UserDto>(_repository.GetByFilter((u) => u.Username == user.Username &&
             u.Password == PassEncrypter.EncryptPassword(user.Password)).FirstOrDefault() );
@@ -67,19 +74,48 @@ namespace TaskManager.Services
             return userDto;
         }
 
-        public Task<UserDto> Delete(int id)
+        public async Task<UserDto> Delete(int id)
         {
-            throw new NotImplementedException();
+            var userToDelete = await _repository.GetById(id);
+            if(userToDelete == null)
+            {
+                Errors.Add("Usuario invalido o no existente");
+                return null;
+            }
+            UserDto DeletedUser = _mapper.Map<UserDto>(userToDelete);
+            _repository.Delete(userToDelete);
+            await _repository.Save();
+            return DeletedUser;
         }
 
-        public Task<UserDto> Update(UpdateUserDto updatedItem, int id)
+        public async Task<UserDto> Update(UpdateUserDto updatedItem, int id)
         {
-            throw new NotImplementedException();
+            updatedItem.Id = id;
+            var UserToUpdate = await _repository.GetById(id);
+            if(UserToUpdate == null)
+            {
+                Errors.Add("Usuario invalido");
+                return null;
+            }
+
+            if(UserToUpdate.Username != updatedItem.UserName)
+            {
+                Errors.Add("No se puede modificar el nombre de usuario");
+                return null;
+            }
+            UserToUpdate = _mapper.Map<UpdateUserDto, Users>(updatedItem,UserToUpdate);
+             _repository.Update(UserToUpdate);
+            await _repository.Save();
+            var dto = _mapper.Map<UserDto>(UserToUpdate);
+            return dto;
+
         }
 
-        public Task<IEnumerable<UserDto>> Get()
+        public async Task<IEnumerable<UserDto>> Get()
         {
-            throw new NotImplementedException();
+            var UserList = await _repository.Get();
+
+            return UserList.Select(u => _mapper.Map<UserDto>(u));
         }
 
         public IEnumerable<UserDto> GetByFilter(int filter)
@@ -90,11 +126,10 @@ namespace TaskManager.Services
         public UserDto GetLoggedUser()
         {
 
-
             ClaimsPrincipal? user = _http?.HttpContext?.User;
             if (user == null) return null;
-         return   new UserDto
-
+            
+            return   new UserDto
             {
                 Id = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()),
                 RoleName = user.FindFirst(ClaimTypes.Role)?.Value.ToString()

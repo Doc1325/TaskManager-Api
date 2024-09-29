@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using System.Security.Claims;
 using TaskManager.Dtos;
 using TaskManager.Services;
@@ -13,7 +15,7 @@ namespace TaskManager.Controllers
     public class UserController : ControllerBase
     {
         IUserService _userService;
-        public UserController( IUserService userService)
+        public UserController(IUserService userService)
         {
             _userService = userService;
         }
@@ -22,7 +24,7 @@ namespace TaskManager.Controllers
         public async Task<IActionResult> Register(InsertUserDto NewUser)
         {
             var userDto = await _userService.Add(NewUser);
-
+            if (userDto == null) return BadRequest(_userService.Errors);
             return Ok("Usuario: " + userDto.Username + " creado satisfactoriamente");
 
         }
@@ -32,7 +34,7 @@ namespace TaskManager.Controllers
         {
             var UserToLog = _userService.IsValidUser(UserToValidate);
 
-            if(UserToLog != null)
+            if (UserToLog != null)
             {
                 List<Claim> ClaimList = new List<Claim>();
                 ClaimList.Add(new Claim(ClaimTypes.Name, UserToLog.Username));
@@ -50,7 +52,7 @@ namespace TaskManager.Controllers
                     AllowRefresh = true
                 };
 
-                ClaimsIdentity claimsIdentity = new ClaimsIdentity(ClaimList, 
+                ClaimsIdentity claimsIdentity = new ClaimsIdentity(ClaimList,
                 CookieAuthenticationDefaults.AuthenticationScheme);
 
                 await HttpContext.SignInAsync(
@@ -65,6 +67,39 @@ namespace TaskManager.Controllers
 
 
         }
+
+        [HttpGet("UsersList")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUsers()
+        {
+            var Users = await _userService.Get();
+            if (Users == null) return BadRequest(_userService.Errors);
+            return Ok(Users);
+
+        }
+
+
+        [HttpDelete("{UserId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUsers(int UserId)
+        {
+            var DeletedUser = await _userService.Delete(UserId);
+            if (DeletedUser == null) return BadRequest(_userService.Errors);
+            return Ok(DeletedUser);
+
+        }
+
+        [HttpPut("{UserId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateUser(int UserId,UpdateUserDto updateUser)
+        {
+            var updatedUser = await _userService.Update(updateUser,UserId);
+            if (updatedUser == null) return BadRequest(_userService.Errors);
+            return Ok(updatedUser);
+
+        }
+
+
     }
 
     }

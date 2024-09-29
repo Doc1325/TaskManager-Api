@@ -75,7 +75,8 @@ namespace TaskManager.Services
             Func<TaskItems, bool> filter;
 
 
-            if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.Id;
+            if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.Id 
+            || t.AsignnedId == userLogged.Id;
             else filter = t => t.AsignnedId == userLogged.Id ;
 
             var TaskList =  _repository.GetByFilter(filter);
@@ -110,12 +111,12 @@ namespace TaskManager.Services
                 return null;
             }
 
-            UserDto userToVerify = await _userService.GetById(TaskToRemove.CreatorId);
+            UserDto userCreator = await _userService.GetById(TaskToRemove.CreatorId);
             UserDto userLogged = _userService.GetLoggedUser();
 
-            if (userToVerify.Id != userLogged.Id  )
+            if (userCreator.Id != userLogged.Id  )
             {
-                Errors.Add("No eres el creador de esta Tarea");
+                Errors.Add("No eres el creador de esta tarea, por tanto no puedes eliminarla");
                 return null;
                 
 
@@ -144,9 +145,10 @@ namespace TaskManager.Services
 
                 return null;
             }
-            if(TaskToUpdate.CreatorId == userLogged.Id)
+            if(TaskToUpdate.CreatorId == userLogged.Id || userLogged.RoleName == "Admin") 
+                //solo el usuario creador o un admin pueden actualizar todos los parametros
             {
-
+                
                 TaskToUpdate = _mapper.Map<UpdateTaskDto, TaskItems>(updatedItem, TaskToUpdate);
                 _repository.Update(TaskToUpdate);
                 await _repository.Save();

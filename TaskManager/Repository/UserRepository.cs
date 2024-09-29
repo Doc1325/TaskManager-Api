@@ -18,12 +18,13 @@ namespace TaskManager.Repository
 
     public void Delete(Users entity)
         {
-            throw new NotImplementedException();
+          _taskContext.Users.Remove(entity);
         }
 
-        public Task<IEnumerable<Users>> Get()
+        public async Task<IEnumerable<Users>> Get()
         {
-            throw new NotImplementedException();
+           var List = await _taskContext.Users.ToListAsync();
+           return List;
         }
 
         public IEnumerable<Users> GetByFilter(Func<Users, bool> filter)
@@ -45,7 +46,8 @@ namespace TaskManager.Repository
 
         public void Update(Users entity)
         {
-            throw new NotImplementedException();
+           _taskContext.Users.Attach(entity);
+           _taskContext.Entry(entity).State = EntityState.Modified;
         }
     }
 }

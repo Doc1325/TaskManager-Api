@@ -18,7 +18,6 @@ namespace TaskManager.Controllers
        private IValidator<InsertTaskDto> _taskValidator;
         private IValidator<UpdateTaskDto> _updateTaskValidator;
 
-
         public TaskController([FromKeyedServices("TaskService")]ITaskservice TaskService,
             [FromKeyedServices("TasksValidator")] IValidator<InsertTaskDto> TaskValidator,
             [FromKeyedServices("UpdateTasksValidator")] IValidator<UpdateTaskDto> UpdateTaskValidator)
@@ -29,18 +28,14 @@ namespace TaskManager.Controllers
 
         }
 
-
         [HttpGet()]
         [Authorize(Roles = "Admin, User")]
-
         public async Task<IEnumerable<TaskDto>> Get()
         {
 
             var TaskList = await _taskService.Get();
             return TaskList;
         }
-
-
 
 
         [HttpGet("{statusid}")]
@@ -51,8 +46,6 @@ namespace TaskManager.Controllers
 
 
         }
-
-
 
         
         [HttpPost()]
@@ -84,13 +77,13 @@ namespace TaskManager.Controllers
 
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Admin, User")]
 
         public async Task<IActionResult> Delete(int id) {
 
 
             var task = await _taskService.Delete(id);
-                       if(task == null) return BadRequest(_taskService?.Errors);
+            if(task == null) return BadRequest(_taskService?.Errors);
 
             return Ok(task);
         }
