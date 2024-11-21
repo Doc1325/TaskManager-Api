@@ -33,9 +33,10 @@ namespace TaskManager.Services
         {
 
             var ExistUser = _repository.GetByFilter(u => u.Username.ToLower() == Insertitem.Username.ToLower()).FirstOrDefault();
-            if (ExistUser == null)
+            if (ExistUser != null)
             {
                 Errors.Add("Ya existe un usuario con este nombre");
+                return null;
             }
             Insertitem.Password = PassEncrypter.EncryptPassword(Insertitem.Password);
             var NewUser = _mapper.Map<Users>(Insertitem);
@@ -131,7 +132,7 @@ namespace TaskManager.Services
             
             return   new UserDto
             {
-                Id = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()),
+                UserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()),
                 RoleName = user.FindFirst(ClaimTypes.Role)?.Value.ToString()
             };
 
