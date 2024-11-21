@@ -13,28 +13,28 @@ namespace TaskManager.Repository
         }
         public async Task Add(Status entity)
         {
-         await _taskContext.Status.AddAsync(entity);
+         await _taskContext.Statuses.AddAsync(entity);
         }
 
         public void Delete(Status entity)
         {
-             _taskContext.Status.Remove(entity);
+             _taskContext.Statuses.Remove(entity);
         }
-
+            
         public async Task<IEnumerable<Status>> Get()
         {
-           var StatusList =  await _taskContext.Status.ToListAsync();
+           var StatusList =  await _taskContext.Statuses.ToListAsync();
             return StatusList;
         }
 
         public IEnumerable<Status> GetByFilter(Func<Status, bool> filter)
         {
-            return  _taskContext.Status.Where(filter).ToList();
+            return  _taskContext.Statuses.Where(filter).ToList();
         }
 
         public async Task<Status> GetById(int id)
         {
-            return await _taskContext.Status.FindAsync(id);
+            return await _taskContext.Statuses.FindAsync(id);
         }
 
         public async Task Save()
@@ -45,7 +45,7 @@ namespace TaskManager.Repository
         public void Update(Status entity)
         {
             _taskContext.Attach(entity);
-            _taskContext.Status.Entry(entity).State = EntityState.Modified;
+            _taskContext.Statuses.Entry(entity).State = EntityState.Modified;
         }
     }
 }

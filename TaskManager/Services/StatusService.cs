@@ -60,7 +60,7 @@ namespace TaskManager.Services
         
         public IEnumerable<StatusDto> GetByFilter(int filter)
         {
-            var Status =  _repository.GetByFilter(x => x.StatusId == filter);
+            var Status =  _repository.GetByFilter(x => x.Id == filter);
             if (Status == null) return null;
             return Status.Select(x => _mapper.Map<StatusDto>(x));
         }

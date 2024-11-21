@@ -22,7 +22,7 @@ namespace TaskManager.Controllers
             [FromKeyedServices("TasksValidator")] IValidator<InsertTaskDto> TaskValidator,
             [FromKeyedServices("UpdateTasksValidator")] IValidator<UpdateTaskDto> UpdateTaskValidator)
         { 
-               _taskService = TaskService;
+            _taskService = TaskService;
             _taskValidator = TaskValidator;
             _updateTaskValidator = UpdateTaskValidator;
 
