@@ -8,7 +8,6 @@ using TaskManager.Models;
 using TaskManager.Repository;
 using TaskManager.Services;
 using TaskManager.Validators;
-using DotNetEnv;
 var builder = WebApplication.CreateBuilder(args);
 
 
