@@ -46,7 +46,7 @@ namespace TaskManager.Controllers
                     ClaimList.Add(new Claim(ClaimTypes.Role, r));
                 }
 
-                ClaimList.Add(new Claim(ClaimTypes.NameIdentifier, UserToLog.Id.ToString()));
+                ClaimList.Add(new Claim(ClaimTypes.NameIdentifier, UserToLog.UserId.ToString()));
                 AuthenticationProperties props = new AuthenticationProperties()
                 {
                     AllowRefresh = true

@@ -33,7 +33,11 @@ namespace TaskManager.Services
         public async Task<UserDto> Add(InsertUserDto Insertitem)
         {
 
+<<<<<<< HEAD
             var ExistUser = _repository.GetByFilter(u => String.Equals(u.Username, Insertitem.Username, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+=======
+            var ExistUser = _repository.GetByFilter(u => u.Username.ToLower() == Insertitem.Username.ToLower()).FirstOrDefault();
+>>>>>>> 6c03eb11b2b12fd14ca189dfba216075c4c5aa37
             if (ExistUser != null)
             {
                 Errors.Add("Ya existe un usuario con este nombre");
@@ -142,7 +146,7 @@ namespace TaskManager.Services
             
             return   new UserDto
             {
-                Id = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()),
+                UserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()),
                 RoleName = user.FindFirst(ClaimTypes.Role)?.Value.ToString()
             };
 

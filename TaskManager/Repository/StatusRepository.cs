@@ -20,7 +20,7 @@ namespace TaskManager.Repository
         {
              _taskContext.Statuses.Remove(entity);
         }
-
+            
         public async Task<IEnumerable<Status>> Get()
         {
            var StatusList =  await _taskContext.Statuses.ToListAsync();
