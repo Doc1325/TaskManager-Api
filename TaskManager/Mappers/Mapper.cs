@@ -10,7 +10,7 @@ namespace TaskManager.Mappers
         {
             CreateMap<TaskItems, TaskDto>();
             CreateMap<InsertTaskDto, TaskItems>();
-            CreateMap<UpdateTaskDto,TaskItems >().ForMember(b => b.TaskId, t => t.MapFrom(a => a.id));
+            CreateMap<UpdateTaskDto,TaskItems >().ForMember(b => b.Id, t => t.MapFrom(a => a.id));
 
 
 

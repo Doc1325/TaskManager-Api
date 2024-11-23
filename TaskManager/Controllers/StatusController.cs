@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -33,6 +34,7 @@ namespace TaskManager.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Add(InsertStatusDto NewStatus)
         {
 
@@ -46,6 +48,7 @@ namespace TaskManager.Controllers
         }
 
         [HttpPut("{Id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int Id, UpdateStatusDto dto)
         {
 
@@ -60,6 +63,7 @@ namespace TaskManager.Controllers
 
 
         [HttpDelete("{Id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int Id)
         {
 

@@ -8,8 +8,10 @@ using TaskManager.Models;
 using TaskManager.Repository;
 using TaskManager.Services;
 using TaskManager.Validators;
-
+using DotNetEnv;
 var builder = WebApplication.CreateBuilder(args);
+
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("all",
@@ -17,11 +19,14 @@ builder.Services.AddCors(options =>
                           .AllowAnyMethod()
                           .AllowAnyHeader());
 });
+builder.Configuration.AddEnvironmentVariables();
+
 // Add services to the container.
 
 builder.Services.AddControllers();
 
 //Servicios
+
 builder.Services.AddKeyedScoped<ITaskservice, TaskService>("TaskService");
 builder.Services.AddKeyedScoped <ICommonService<StatusDto, InsertStatusDto, UpdateStatusDto, int>,StatusService>("StatusService");
 builder.Services.AddScoped<IUserService, UsersService>();
@@ -35,7 +40,10 @@ builder.Services.AddKeyedScoped<IRepository<Users>, UserRepository>("Users");
 builder.Services.AddDbContext<TaskContext>(options =>
 {
     options.UseSqlServer(builder.Configuration["MyDatabaseConnection"]); // utilizo un secreto para mi bd local
+
 });
+
+
 
 // Mappers
 builder.Services.AddAutoMapper(typeof(Mapper), typeof(StatusMapper), typeof(UserMapper));
@@ -73,6 +81,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<TaskContext>();
+    InitialSetup.Setup(context,builder.Configuration);
+
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

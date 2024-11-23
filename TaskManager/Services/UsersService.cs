@@ -12,6 +12,7 @@ namespace TaskManager.Services
 {
     public class UsersService: IUserService
     {
+         
 
         private IRepository<Users> _repository;
         private IMapper _mapper;
@@ -32,10 +33,11 @@ namespace TaskManager.Services
         public async Task<UserDto> Add(InsertUserDto Insertitem)
         {
 
-            var ExistUser = _repository.GetByFilter(u => u.Username.ToLower() == Insertitem.Username.ToLower()).FirstOrDefault();
-            if (ExistUser == null)
+            var ExistUser = _repository.GetByFilter(u => String.Equals(u.Username, Insertitem.Username, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            if (ExistUser != null)
             {
                 Errors.Add("Ya existe un usuario con este nombre");
+                return null;
             }
             Insertitem.Password = PassEncrypter.EncryptPassword(Insertitem.Password);
             var NewUser = _mapper.Map<Users>(Insertitem);
@@ -82,6 +84,13 @@ namespace TaskManager.Services
                 Errors.Add("Usuario invalido o no existente");
                 return null;
             }
+            if (userToDelete.RoleName == "Admin") {
+                Errors.Add(
+                    "No se pueden eliminar los usuarios de administrador por esta vía" + 
+                    "Contacte al departamento de soporte para asistencia");
+                return null;
+            }
+
             UserDto DeletedUser = _mapper.Map<UserDto>(userToDelete);
             _repository.Delete(userToDelete);
             await _repository.Save();
@@ -118,9 +127,11 @@ namespace TaskManager.Services
             return UserList.Select(u => _mapper.Map<UserDto>(u));
         }
 
-        public IEnumerable<UserDto> GetByFilter(int filter)
+        public IEnumerable<UserDto> GetByFilter(Func<Users,bool> filter)
         {
-            throw new NotImplementedException();
+          var UsersByRole =  _repository.GetByFilter(filter);
+          return UsersByRole.Select(u => _mapper.Map<UserDto>(u));
+
         }
 
         public UserDto GetLoggedUser()

@@ -76,8 +76,8 @@ namespace TaskManager.Services
 
 
             if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.Id 
-            || t.AsignnedId == userLogged.Id;
-            else filter = t => t.AsignnedId == userLogged.Id ;
+            || t.AssignedId == userLogged.Id;
+            else filter = t => t.AssignedId == userLogged.Id ;
 
             var TaskList =  _repository.GetByFilter(filter);
 
@@ -94,7 +94,7 @@ namespace TaskManager.Services
             Func<TaskItems, bool> filter;
 
             if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.Id && t.StatusId == StatusId;
-            else filter = t => t.AsignnedId == userLogged.Id && t.StatusId == StatusId;
+            else filter = t => t.AssignedId == userLogged.Id && t.StatusId == StatusId;
 
             var TaskList = _repository.GetByFilter(filter);
 
@@ -121,7 +121,7 @@ namespace TaskManager.Services
                 
 
             }
-                TaskDto dto = _mapper.Map<TaskDto>(TaskToRemove);
+             TaskDto dto = _mapper.Map<TaskDto>(TaskToRemove);
             _repository.Delete(TaskToRemove);
             await _repository.Save();
             return dto;
@@ -157,9 +157,9 @@ namespace TaskManager.Services
 
             } 
             
-            if (TaskToUpdate.AsignnedId == userLogged.Id)
+            if (TaskToUpdate.AssignedId == userLogged.Id)
             {
-                if(TaskToUpdate.Title != updatedItem.Title || TaskToUpdate.Description != updatedItem.Description || TaskToUpdate.AsignnedId != updatedItem.AsignnedId)
+                if(TaskToUpdate.Title != updatedItem.Title || TaskToUpdate.Description != updatedItem.Description || TaskToUpdate.AssignedId != updatedItem.AsignnedId)
                 {
                     Errors.Add("Solo tienes permiso para modificar el estatus de esta tarea");
                     return null;
