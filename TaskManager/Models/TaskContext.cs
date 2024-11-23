@@ -24,7 +24,10 @@ public partial class TaskContext : DbContext
     public virtual DbSet<Users> Users { get; set; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     
+=======
+>>>>>>> 6c03eb11b2b12fd14ca189dfba216075c4c5aa37
 =======
 >>>>>>> 6c03eb11b2b12fd14ca189dfba216075c4c5aa37
     protected override void OnModelCreating(ModelBuilder modelBuilder)

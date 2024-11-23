@@ -76,9 +76,15 @@ namespace TaskManager.Services
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.Id 
             || t.AssignedId == userLogged.Id;
             else filter = t => t.AssignedId == userLogged.Id ;
+=======
+            if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.UserId 
+            || t.AssignedId == userLogged.UserId;
+            else filter = t => t.AssignedId == userLogged.UserId ;
+>>>>>>> 6c03eb11b2b12fd14ca189dfba216075c4c5aa37
 =======
             if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.UserId 
             || t.AssignedId == userLogged.UserId;
@@ -100,8 +106,13 @@ namespace TaskManager.Services
             Func<TaskItems, bool> filter;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.Id && t.StatusId == StatusId;
             else filter = t => t.AssignedId == userLogged.Id && t.StatusId == StatusId;
+=======
+            if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.UserId && t.StatusId == StatusId;
+            else filter = t => t.AssignedId == userLogged.UserId && t.StatusId == StatusId;
+>>>>>>> 6c03eb11b2b12fd14ca189dfba216075c4c5aa37
 =======
             if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.UserId && t.StatusId == StatusId;
             else filter = t => t.AssignedId == userLogged.UserId && t.StatusId == StatusId;
@@ -169,7 +180,11 @@ namespace TaskManager.Services
             } 
             
 <<<<<<< HEAD
+<<<<<<< HEAD
             if (TaskToUpdate.AssignedId == userLogged.Id)
+=======
+            if (TaskToUpdate.AssignedId == userLogged.UserId)
+>>>>>>> 6c03eb11b2b12fd14ca189dfba216075c4c5aa37
 =======
             if (TaskToUpdate.AssignedId == userLogged.UserId)
 >>>>>>> 6c03eb11b2b12fd14ca189dfba216075c4c5aa37

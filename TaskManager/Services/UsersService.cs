@@ -37,6 +37,9 @@ namespace TaskManager.Services
             var ExistUser = _repository.GetByFilter(u => String.Equals(u.Username, Insertitem.Username, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 =======
             var ExistUser = _repository.GetByFilter(u => u.Username.ToLower() == Insertitem.Username.ToLower()).FirstOrDefault();
+<<<<<<< HEAD
+>>>>>>> 6c03eb11b2b12fd14ca189dfba216075c4c5aa37
+=======
 >>>>>>> 6c03eb11b2b12fd14ca189dfba216075c4c5aa37
             if (ExistUser != null)
             {
