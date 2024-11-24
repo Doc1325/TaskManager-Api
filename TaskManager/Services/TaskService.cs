@@ -10,16 +10,17 @@ namespace TaskManager.Services
 {
     public class TaskService : ITaskservice
     {
-       private IRepository<TaskItems> _repository;
+        private IRepository<TaskItems> _repository;
         private IMapper _mapper;
         private ICommonService<StatusDto, InsertStatusDto, UpdateStatusDto, int> _statusService;
         private IUserService _userService;
         public List<String> Errors { get; }
-        public TaskService([FromKeyedServices("Tasks")]IRepository<TaskItems> repository,
-            [FromKeyedServices("StatusService")] ICommonService<StatusDto, InsertStatusDto, UpdateStatusDto, int> StatusService, 
+        public TaskService([FromKeyedServices("Tasks")] IRepository<TaskItems> repository,
+            [FromKeyedServices("StatusService")] ICommonService<StatusDto, InsertStatusDto, UpdateStatusDto, int> StatusService,
             IMapper mapper
-             ,IUserService userService) {
-            
+             , IUserService userService)
+        {
+
             _repository = repository;
             _mapper = mapper;
             _statusService = StatusService;
@@ -27,7 +28,7 @@ namespace TaskManager.Services
             Errors = new List<String>();
 
         }
- 
+
         public async Task<TaskDto> Add(InsertTaskDto NewTask)
         {
             UserDto userLogged = _userService.GetLoggedUser();
@@ -54,9 +55,9 @@ namespace TaskManager.Services
 
             }
 
-           
+
             TaskItems item = _mapper.Map<TaskItems>(NewTask);
-           
+
             await _repository.Add(item);
             await _repository.Save();
             TaskDto dto = _mapper.Map<TaskDto>(item);
@@ -75,11 +76,11 @@ namespace TaskManager.Services
             Func<TaskItems, bool> filter;
 
 
-            if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.Id 
+            if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.Id
             || t.AssignedId == userLogged.Id;
-            else filter = t => t.AssignedId == userLogged.Id ;
+            else filter = t => t.AssignedId == userLogged.Id;
 
-            var TaskList =  _repository.GetByFilter(filter);
+            var TaskList = _repository.GetByFilter(filter);
 
             return TaskList.Select(t => _mapper.Map<TaskDto>(t));
 
@@ -93,7 +94,7 @@ namespace TaskManager.Services
 
             Func<TaskItems, bool> filter;
 
-            if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.Id && t.StatusId == StatusId;
+            if (userLogged.RoleName == "Admin") filter = t => (t.CreatorId == userLogged.Id || t.AssignedId == userLogged.Id) && t.StatusId == StatusId;
             else filter = t => t.AssignedId == userLogged.Id && t.StatusId == StatusId;
 
             var TaskList = _repository.GetByFilter(filter);
@@ -104,7 +105,7 @@ namespace TaskManager.Services
         public async Task<TaskDto> Delete(int id)
         {
 
-          TaskItems TaskToRemove = await _repository.GetById(id);
+            TaskItems TaskToRemove = await _repository.GetById(id);
             if (TaskToRemove == null)
             {
                 Errors.Add("El Id de la tarea es invalido");
@@ -114,14 +115,14 @@ namespace TaskManager.Services
             UserDto userCreator = await _userService.GetById(TaskToRemove.CreatorId);
             UserDto userLogged = _userService.GetLoggedUser();
 
-            if (userCreator.Id != userLogged.Id  )
+            if (userCreator.Id != userLogged.Id)
             {
                 Errors.Add("No eres el creador de esta tarea, por tanto no puedes eliminarla");
                 return null;
-                
+
 
             }
-             TaskDto dto = _mapper.Map<TaskDto>(TaskToRemove);
+            TaskDto dto = _mapper.Map<TaskDto>(TaskToRemove);
             _repository.Delete(TaskToRemove);
             await _repository.Save();
             return dto;
@@ -177,13 +178,16 @@ namespace TaskManager.Services
                 dto = _mapper.Map<TaskDto>(TaskToUpdate);
                 return dto;
             }
-             else {
-          
+            else
+            {
+
                 Errors.Add("No tienes permisos para modificar esta tarea");
+                return null;
 
             }
 
 
 
         }
+    }
 }
