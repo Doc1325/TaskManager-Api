@@ -7,6 +7,10 @@
 		<UserSecretsId>8db7a0a1-9de5-46fe-9377-f25fbff9e7e3</UserSecretsId>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<Compile Remove="NewFolder\**" />
 		<Content Remove="NewFolder\**" />

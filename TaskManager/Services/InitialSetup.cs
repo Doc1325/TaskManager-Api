@@ -38,7 +38,7 @@ namespace TaskManager.Services
              {
                  Username = config["DefaultUsername"],
                  Password = Utils.PassEncrypter.EncryptPassword(config["DefaultPassword"]),
-                 RoleName = "admin"
+                 RoleName = "Admin" //Los roles son case-sensitive
              };
 
             if (!context.Statuses.Any()) {

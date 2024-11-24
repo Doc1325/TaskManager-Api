@@ -35,13 +35,13 @@ namespace TaskManager.Services
 
 
 
-            if (NewTask.CreatorId != userLogged.Id)
+            if (NewTask.CreatorId != userLogged.id)
             {
                 Errors.Add("No puedes crear una tarea en nombre de otro usuario");
                 return null;
             }
 
-            if (NewTask.AsignnedId != userLogged.Id && userLogged.RoleName != "Admin")
+            if (NewTask.AssignedId != userLogged.id && userLogged.RoleName != "Admin")
             {
                 Errors.Add("No tienes permisos para asignar tareas a otro usuario");
                 return null;
@@ -57,7 +57,7 @@ namespace TaskManager.Services
 
 
             TaskItems item = _mapper.Map<TaskItems>(NewTask);
-
+            Console.WriteLine(item);
             await _repository.Add(item);
             await _repository.Save();
             TaskDto dto = _mapper.Map<TaskDto>(item);
@@ -76,9 +76,9 @@ namespace TaskManager.Services
             Func<TaskItems, bool> filter;
 
 
-            if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.Id
-            || t.AssignedId == userLogged.Id;
-            else filter = t => t.AssignedId == userLogged.Id;
+            if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.id
+            || t.AssignedId == userLogged.id;
+            else filter = t => t.AssignedId == userLogged.id;
 
             var TaskList = _repository.GetByFilter(filter);
 
@@ -94,8 +94,8 @@ namespace TaskManager.Services
 
             Func<TaskItems, bool> filter;
 
-            if (userLogged.RoleName == "Admin") filter = t => (t.CreatorId == userLogged.Id || t.AssignedId == userLogged.Id) && t.StatusId == StatusId;
-            else filter = t => t.AssignedId == userLogged.Id && t.StatusId == StatusId;
+            if (userLogged.RoleName == "Admin") filter = t => (t.CreatorId == userLogged.id || t.AssignedId == userLogged.id) && t.StatusId == StatusId;
+            else filter = t => t.AssignedId == userLogged.id && t.StatusId == StatusId;
 
             var TaskList = _repository.GetByFilter(filter);
 
@@ -115,7 +115,7 @@ namespace TaskManager.Services
             UserDto userCreator = await _userService.GetById(TaskToRemove.CreatorId);
             UserDto userLogged = _userService.GetLoggedUser();
 
-            if (userCreator.Id != userLogged.Id)
+            if (userCreator.id != userLogged.id)
             {
                 Errors.Add("No eres el creador de esta tarea, por tanto no puedes eliminarla");
                 return null;
@@ -146,7 +146,7 @@ namespace TaskManager.Services
 
                 return null;
             }
-            if (TaskToUpdate.CreatorId == userLogged.Id || userLogged.RoleName == "Admin")
+            if (TaskToUpdate.CreatorId == userLogged.id || userLogged.RoleName == "Admin")
             //solo el usuario creador o un admin pueden actualizar todos los parametros
             {
 
@@ -160,13 +160,13 @@ namespace TaskManager.Services
 
 
 
-            if (TaskToUpdate.AssignedId == userLogged.Id)
+            if (TaskToUpdate.AssignedId == userLogged.id)
             {
 
 
 
 
-                if (TaskToUpdate.Title != updatedItem.Title || TaskToUpdate.Description != updatedItem.Description || TaskToUpdate.AssignedId != updatedItem.AsignnedId)
+                if (TaskToUpdate.Title != updatedItem.Title || TaskToUpdate.Description != updatedItem.Description || TaskToUpdate.AssignedId != updatedItem.AssignedId)
                 {
                     Errors.Add("Solo tienes permiso para modificar el estatus de esta tarea");
                     return null;

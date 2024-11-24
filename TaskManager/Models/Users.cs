@@ -5,7 +5,7 @@ namespace TaskManager.Models;
 
 public partial class Users
 {
-    public int Id { get; set; }
+    public int id { get; set; }
 
     public string Username { get; set; } = null!;
 

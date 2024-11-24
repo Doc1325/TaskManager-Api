@@ -70,7 +70,7 @@ public partial class TaskContext : DbContext
 
         modelBuilder.Entity<Users>(entity =>
         {
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.id).HasColumnName("id");
             entity.Property(e => e.Password).IsUnicode(false);
             entity.Property(e => e.RoleName)
                 .HasMaxLength(20)

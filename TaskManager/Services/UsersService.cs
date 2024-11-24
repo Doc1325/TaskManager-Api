@@ -143,7 +143,7 @@ namespace TaskManager.Services
             
             return   new UserDto
             {
-                Id = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()),
+                id = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).Value.ToString()),
                 RoleName = user.FindFirst(ClaimTypes.Role)?.Value.ToString()
             };
 
