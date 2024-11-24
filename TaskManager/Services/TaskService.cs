@@ -157,25 +157,33 @@ namespace TaskManager.Services
 
             }
 
-            if (TaskToUpdate.AssignedId != userLogged.Id)
+
 
             if (TaskToUpdate.AssignedId == userLogged.Id)
             {
-                return null;
 
+
+
+
+                if (TaskToUpdate.Title != updatedItem.Title || TaskToUpdate.Description != updatedItem.Description || TaskToUpdate.AssignedId != updatedItem.AsignnedId)
+                {
+                    Errors.Add("Solo tienes permiso para modificar el estatus de esta tarea");
+                    return null;
+                }
+
+                TaskToUpdate = _mapper.Map<UpdateTaskDto, TaskItems>(updatedItem, TaskToUpdate);
+                _repository.Update(TaskToUpdate);
+                await _repository.Save();
+                dto = _mapper.Map<TaskDto>(TaskToUpdate);
+                return dto;
+            }
+             else {
+          
+                Errors.Add("No tienes permisos para modificar esta tarea");
 
             }
-            if (TaskToUpdate.Title != updatedItem.Title || TaskToUpdate.Description != updatedItem.Description || TaskToUpdate.AssignedId != updatedItem.AsignnedId)
-            {
-                Errors.Add("Solo tienes permiso para modificar el estatus de esta tarea");
-                return null;
-            }
 
-            TaskToUpdate = _mapper.Map<UpdateTaskDto, TaskItems>(updatedItem, TaskToUpdate);
-            _repository.Update(TaskToUpdate);
-            await _repository.Save();
-            dto = _mapper.Map<TaskDto>(TaskToUpdate);
-            return dto;
+
+
         }
-    }
 }
