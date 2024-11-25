@@ -38,8 +38,10 @@ namespace TaskManager.Controllers
         }
 
 
-        [HttpGet("{statusid}")]
-       public  IEnumerable<TaskDto> GetByStatus(int statusid)
+        [HttpGet("status={statusid}")]
+        [Authorize(Roles = "Admin, User")]
+
+        public IEnumerable<TaskDto> GetByStatus(int statusid)
         {
             var TaskList = _taskService.GetByFilter(statusid);
             return TaskList;
@@ -57,7 +59,7 @@ namespace TaskManager.Controllers
             if (!validate.IsValid) return BadRequest(validate.Errors);
             var task = await _taskService.Add(NewTask);
             if (task == null) return BadRequest(_taskService.Errors);
-            return CreatedAtAction(nameof(Get), new {task.Id}, task);
+            return CreatedAtAction(nameof(Get), task);
 
 
 

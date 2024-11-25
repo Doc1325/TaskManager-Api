@@ -5,6 +5,7 @@ using TaskManager.Models;
 using TaskManager.Repository;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace TaskManager.Services
 {
@@ -41,7 +42,7 @@ namespace TaskManager.Services
                 return null;
             }
 
-            if (NewTask.AssignedId != userLogged.id && userLogged.RoleName != "Admin")
+            if (NewTask?.AssignedId != userLogged.id && userLogged.RoleName != "Admin")
             {
                 Errors.Add("No tienes permisos para asignar tareas a otro usuario");
                 return null;
@@ -77,8 +78,8 @@ namespace TaskManager.Services
 
 
             if (userLogged.RoleName == "Admin") filter = t => t.CreatorId == userLogged.id
-            || t.AssignedId == userLogged.id;
-            else filter = t => t.AssignedId == userLogged.id;
+            || t?.AssignedId == userLogged.id;
+            else filter = t => t?   .AssignedId == userLogged.id;
 
             var TaskList = _repository.GetByFilter(filter);
 
@@ -89,6 +90,13 @@ namespace TaskManager.Services
         public IEnumerable<TaskDto> GetByFilter(int StatusId)
 
         {
+            if (_statusService.GetByFilter(StatusId).IsNullOrEmpty())
+            {
+
+                Errors.Add("El Id del estatus es invalido");
+                return null;
+
+            }
             UserDto userLogged = _userService.GetLoggedUser();
 
 
@@ -96,7 +104,7 @@ namespace TaskManager.Services
 
             if (userLogged.RoleName == "Admin") filter = t => (t.CreatorId == userLogged.id || t.AssignedId == userLogged.id) && t.StatusId == StatusId;
             else filter = t => t.AssignedId == userLogged.id && t.StatusId == StatusId;
-
+            // debe ser actualizado al integrar nuevos roles
             var TaskList = _repository.GetByFilter(filter);
 
             return TaskList.Select(t => _mapper.Map<TaskDto>(t));
@@ -130,26 +138,38 @@ namespace TaskManager.Services
 
         public async Task<TaskDto> Update(UpdateTaskDto updatedItem, int id)
         {
-            TaskItems TaskToUpdate = await _repository.GetById(id);
+            TaskItems ?TaskToUpdate = await _repository.GetById(id);
             UserDto userLogged = _userService.GetLoggedUser();
             TaskDto dto = new TaskDto();
+           
             if (TaskToUpdate == null)
             {
                 Errors.Add("El Id de la tarea es invalido");
-
                 return null;
             }
+
             if (_statusService.GetByFilter(updatedItem.StatusId).IsNullOrEmpty())
             {
 
                 Errors.Add("El Id del estatus es invalido");
 
-                return null;
             }
+            bool existUser = await _userService.GetById(updatedItem.AssignedId) != null;
+
+            if (!existUser)
+            {
+                Errors.Add("El Id del usuario creador o asignado es invalido");
+
+            }
+
             if (TaskToUpdate.CreatorId == userLogged.id || userLogged.RoleName == "Admin")
             //solo el usuario creador o un admin pueden actualizar todos los parametros
             {
 
+                if (Errors.Count > 0)
+                {
+                    return null;
+                }
                 TaskToUpdate = _mapper.Map<UpdateTaskDto, TaskItems>(updatedItem, TaskToUpdate);
                 _repository.Update(TaskToUpdate);
                 await _repository.Save();
@@ -162,16 +182,14 @@ namespace TaskManager.Services
 
             if (TaskToUpdate.AssignedId == userLogged.id)
             {
-
-
-
-
                 if (TaskToUpdate.Title != updatedItem.Title || TaskToUpdate.Description != updatedItem.Description || TaskToUpdate.AssignedId != updatedItem.AssignedId)
                 {
                     Errors.Add("Solo tienes permiso para modificar el estatus de esta tarea");
+                }
+                if (Errors.Count > 0)
+                {
                     return null;
                 }
-
                 TaskToUpdate = _mapper.Map<UpdateTaskDto, TaskItems>(updatedItem, TaskToUpdate);
                 _repository.Update(TaskToUpdate);
                 await _repository.Save();
@@ -183,11 +201,11 @@ namespace TaskManager.Services
 
                 Errors.Add("No tienes permisos para modificar esta tarea");
                 return null;
-
             }
 
-
-
+            
         }
+
+      
     }
 }
