@@ -68,7 +68,26 @@ namespace TaskManager.Controllers
 
         }
 
+        [HttpPost("Logout")]
+        [Authorize("Admin, User")]
+
+        public async Task<IActionResult> Logout() {
+            try
+            {
+                await HttpContext.SignOutAsync();
+                return Ok("Sesion cerrada con exito");
+
+            }
+            catch (Exception)
+            {
+
+                return BadRequest("Error al cerrar la sesion");
+            }
+       
+        }
+
         [HttpGet("UsersList")]
+        [Authorize("Admin, User")]
         public async Task<IActionResult> GetUsers()
         {
             var Users = await _userService.Get();

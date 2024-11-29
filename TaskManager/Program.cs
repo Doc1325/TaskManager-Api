@@ -60,7 +60,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
     options =>
     {
-        options.ExpireTimeSpan = TimeSpan.FromSeconds(40);
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
         
         options.Events.OnRedirectToLogin = context =>
         {
