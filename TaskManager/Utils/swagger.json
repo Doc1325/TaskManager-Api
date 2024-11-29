@@ -1,0 +1,737 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Task Manager API",
+    "version": "v1",
+    "description": "Una API para la gestión colaborativa de tareas. Permite a los usuarios crear,  actualizar, eliminar y consultar tareas según su rol (Administrador o Usuario regular).\n"
+  },
+  "security": [
+    {
+      "CookieAuth": []
+    }
+  ],
+  "paths": {
+    "/api/Status": {
+      "get": {
+        "summary": "Obtiene todos los estatus disponibles.",
+        "description": "Devuelve una lista de todos los estatus registrados en el sistema.",
+        "tags": [
+          "Status"
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de estatus obtenida con éxito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StatusDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Crea un nuevo estatus.",
+        "description": "Permite registrar un nuevo estatus en el sistema.",
+        "tags": [
+          "Status"
+        ],
+        "requestBody": {
+          "description": "Datos necesarios para crear un nuevo estatus.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InsertStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Estatus creado exitosamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos no validos. Verifique los errores en los datos enviados.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Status/{Id}": {
+      "put": {
+        "summary": "Actualiza un estatus existente.",
+        "description": "Permite modificar los datos de un estatus por su ID.",
+        "tags": [
+          "Status"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "ID del estatus a actualizar.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Datos necesarios para actualizar el estatus.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Estatus actualizado exitosamente. Devuelve el objeto de estatus actualizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Estatus no encontrado."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Elimina un estatus.",
+        "description": "Permite eliminar un estatus existente por su ID.",
+        "tags": [
+          "Status"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "ID del estatus a eliminar.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estatus eliminado exitosamente.Devuelve el estatus eliminado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Estatus no encontrado."
+          }
+        }
+      }
+    },
+    "/api/Task": {
+      "get": {
+        "summary": "Obtiene tareas del usuario.",
+        "description": "Devuelve una lista de tareas accesibles para el usuario autenticado,  filtradas por su estatus si se especifica.\n",
+        "tags": [
+          "Task"
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de tareas obtenida con éxito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaskDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Crea una nueva tarea.",
+        "description": "Los usuarios con rol Administrador pueden asignar tareas a sí mismos o a otros usuarios.  Los usuarios regulares solo pueden asignarse tareas a sí mismos.\n",
+        "tags": [
+          "Task"
+        ],
+        "requestBody": {
+          "description": "Datos necesarios para crear una tarea.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InsertTaskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tarea creada exitosamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InsertTaskDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de entrada no válidos."
+          }
+        }
+      }
+    },
+    "/api/Task/{id}": {
+      "put": {
+        "summary": "Actualiza una tarea existente.",
+        "description": "Permite modificar los datos de una tarea. Solo puede ser actualizada por el usuario creador,  asignado o un Administrador.\n",
+        "tags": [
+          "Task"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de la tarea a actualizar.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Datos necesarios para actualizar la tarea.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTaskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tarea actualizada exitosamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InsertTaskDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida. Verifique los errores en los datos enviados.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tarea no encontrada."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Elimina una tarea.",
+        "description": "Permite eliminar una tarea específica. Solo el usuario creador puede eliminarla.\n",
+        "tags": [
+          "Task"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de la tarea a eliminar.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tarea eliminada exitosamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No tiene permisos para eliminar esta tarea."
+          },
+          "404": {
+            "description": "Tarea no encontrada."
+          }
+        }
+      }
+    },
+    "/api/User/Register": {
+      "post": {
+        "summary": "Registra un nuevo usuario.",
+        "security": [],
+        "description": "Permite registrar un usuario en el sistema.",
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "description": "Datos necesarios para el registro.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InsertUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario registrado exitosamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Información invalida. Verifique los errores en los datos enviados.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/User/UsersList": {
+      "get": {
+        "summary": "Obtiene todos los usuarios registrados.",
+        "description": "Devuelve una lista de todos los usuarios registrados en el sistema.",
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios obtenida con éxito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/User/Login": {
+      "post": {
+        "summary": "Inicia sesión en el sistema.",
+        "description": "Permite autenticar un usuario y generar un token de acceso.",
+        "security": [],
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "description": "Credenciales del usuario.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InsertUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sesión iniciada exitosamente."
+          },
+          "401": {
+            "description": "Credenciales incorrectas.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/User/{id}": {
+      "put": {
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID del usuario a actualizar.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "summary": "Actualiza la información de un usuario ya existente.",
+        "description": "Permite a los administradores actualizar el rol y nombre de un usuario.",
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "description": "Información del usuario.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Datos actualizados correctamente. Verifique la nueva informacion  actualizada en los datos enviados.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Información invalida. Verifique los errores en los datos enviados",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID del usuario a eliminar.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "summary": "Elimina a un usuario ya existente.",
+        "description": "Permite a los administradores actualizar eliminar la información de un usuario.",
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario eliminado exitosamente. Verifique el usuario eliminado en los datos enviados.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Información invalida. Verifique los errores en los datos enviados.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorList"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "StatusDto": {
+        "type": "object",
+        "description": "Información del status que se envia en las respuestas",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "statusName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "statusName"
+        ],
+        "additionalProperties": false
+      },
+      "InsertStatusDto": {
+        "type": "object",
+        "description": "Información del status a registrar",
+        "properties": {
+          "statusName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusName"
+        ],
+        "additionalProperties": false
+      },
+      "UpdateStatusDto": {
+        "type": "object",
+        "description": "Información del status a actualizar",
+        "properties": {
+          "statusName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusName"
+        ],
+        "additionalProperties": false
+      },
+      "TaskDto": {
+        "type": "object",
+        "description": "Información de las tareas que se envia en las respuestas",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "statusId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "creatorId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assignedId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "statusId",
+          "creatorId",
+          "assignedId"
+        ],
+        "additionalProperties": false
+      },
+      "InsertTaskDto": {
+        "type": "object",
+        "description": "Información de la tarea a registrar",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "statusId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "creatorId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assignedId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "title",
+          "statusId",
+          "creatorId"
+        ],
+        "additionalProperties": false
+      },
+      "UpdateTaskDto": {
+        "type": "object",
+        "description": "Información de la tarea a actualizar",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "statusId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assignedId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "statusId"
+        ],
+        "additionalProperties": false
+      },
+      "InsertUserDto": {
+        "type": "object",
+        "description": "Información del usuario a registrar",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "additionalProperties": false
+      },
+      "UserDto": {
+        "type": "object",
+        "description": "Información del usuario que se envia en las respuestas",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "username": {
+            "type": "string"
+          },
+          "rolename": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "rolename"
+        ],
+        "additionalProperties": false
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "description": "Información del usuario a actualizar",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "roleName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "userName"
+        ],
+        "additionalProperties": false
+      },
+      "Error": {
+        "type": "string",
+        "description": "Descripción legible del error.",
+        "additionalProperties": false
+      },
+      "ErrorList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Error"
+        },
+        "description": "Una lista de errores que describe los problemas encontrados."
+      },
+      "UserList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/UserDto"
+        },
+        "description": "Una lista de usuarios registrados."
+      }
+    },
+    "securitySchemes": {
+      "CookieAuth": {
+        "type": "apiKey",
+        "description": "Requiere inicio de sesión a través del endpoint /api/User/Login",
+        "in": "cookie",
+        "name": ".AspNetCore.Cookies"
+      }
+    }
+  }
+}

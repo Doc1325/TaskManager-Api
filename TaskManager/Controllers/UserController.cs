@@ -69,7 +69,6 @@ namespace TaskManager.Controllers
         }
 
         [HttpGet("UsersList")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUsers()
         {
             var Users = await _userService.Get();
@@ -81,7 +80,7 @@ namespace TaskManager.Controllers
 
         [HttpDelete("{UserId}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetUsers(int UserId)
+        public async Task<IActionResult> RemoveUsers(int UserId)
         {
             var DeletedUser = await _userService.Delete(UserId);
             if (DeletedUser == null) return BadRequest(_userService.Errors);

@@ -100,12 +100,21 @@ using (var scope = app.Services.CreateScope())
 
 }
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
 
-}
+app.UseSwagger(c =>
+{
+    c.RouteTemplate = "Utils/swagger.json  ";
+});
+app.UseSwaggerUI();
+
+app.Map("/swagger/v1/swagger.json", appBuilder =>
+{
+    appBuilder.Run(async context =>
+    {
+        context.Response.ContentType = "application/json";
+        await context.Response.SendFileAsync("Utils/swagger.json");
+    });
+});
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
